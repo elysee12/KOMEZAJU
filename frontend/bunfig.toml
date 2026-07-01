@@ -1,0 +1,5 @@
+[install]
+# 24h supply-chain guard: skip package versions published less than a day ago.
+minimumReleaseAge = 86400
+# Empty exclusions list - no packages bypass the 24h guard
+minimumReleaseAgeExcludes = []

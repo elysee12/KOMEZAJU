@@ -1,0 +1,44 @@
+============================================
+KOMEZAJU WEBSITE - QUICK START
+============================================
+
+ALL BUGS FIXED:
+✅ Hydration error - RESOLVED
+✅ Images not loading - RESOLVED  
+✅ Navigation dropdowns - WORKING
+
+TO START DEVELOPMENT SERVER:
+----------------------------
+Double-click: dev.cmd
+
+OR in terminal:
+npm run dev
+
+Server opens at: http://localhost:8080
+
+
+TO BUILD FOR PRODUCTION:
+-------------------------
+Double-click: build.cmd
+
+OR in terminal:
+npm run build
+
+Output folder: dist/
+
+
+WHAT TO EXPECT:
+---------------
+✓ No hydration errors
+✓ All 8 images load correctly
+✓ Dropdown menus work (desktop + mobile)
+✓ Language switching works (EN/RW/FR)
+✓ Clean console, no errors
+
+
+IF YOU SEE POWERSHELL ERRORS:
+------------------------------
+Use the .cmd files instead of npm directly
+They bypass PowerShell execution policy
+
+============================================

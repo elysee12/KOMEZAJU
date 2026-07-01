@@ -1,0 +1,3 @@
+@echo off
+echo Starting KOMEZAJU development server...
+npm run dev
