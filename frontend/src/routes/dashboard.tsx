@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   LayoutDashboard, ImagePlus, HeartHandshake, Settings,
@@ -7,13 +7,22 @@ import {
   Download, X, Pencil, RefreshCw, AlertCircle,
 } from "lucide-react";
 import logo from "../assets/logo.png";
-
-const API = "http://localhost:3000";
-const authHeaders = () => ({
-  Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
-});
+import { API_URL, getAuthHeaders, isAuthenticated, clearAuth } from "../lib/api";
 
 export const Route = createFileRoute("/dashboard")({
+  beforeLoad: ({ location }) => {
+    // Check authentication before loading dashboard
+    if (!isAuthenticated()) {
+      // Redirect to homepage if not authenticated
+      throw redirect({
+        to: "/",
+        search: {
+          // Optional: store redirect path to return after login
+          redirect: location.href,
+        },
+      });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Dashboard — KOMEZAJU Admin" },
@@ -59,15 +68,26 @@ function DashboardPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    // Double-check authentication on mount
+    if (!isAuthenticated()) {
+      navigate({ to: "/" });
+      return;
+    }
+    
     const stored = localStorage.getItem("user");
-    if (!token) { navigate({ to: "/" }); return; }
-    if (stored) setUser(JSON.parse(stored));
+    if (stored) {
+      try {
+        setUser(JSON.parse(stored));
+      } catch {
+        // Invalid user data, clear and redirect
+        clearAuth();
+        navigate({ to: "/" });
+      }
+    }
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
+    clearAuth();
     navigate({ to: "/" });
   };
 
@@ -157,8 +177,8 @@ function OverviewTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
     setLoading(true); setError(null);
     try {
       const [donationsRes, messagesRes] = await Promise.all([
-        fetch(`${API}/donations/stats`, { headers: authHeaders() }),
-        fetch(`${API}/messages/stats`, { headers: authHeaders() }),
+        fetch(`${API_URL}/donations/stats`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/messages/stats`, { headers: getAuthHeaders() }),
       ]);
       if (!donationsRes.ok) throw new Error("Failed to load stats");
       
@@ -282,7 +302,7 @@ function MediaTab() {
   const loadImages = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/images/all`, { headers: authHeaders() });
+      const res = await fetch(`${API_URL}/images/all`, { headers: getAuthHeaders() });
       if (!res.ok) throw new Error();
       setImages(await res.json());
     } catch { setImages([]); }
@@ -312,7 +332,7 @@ function MediaTab() {
     form.append("category", selectedCategory);
     form.append("title", selectedFile.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "));
     try {
-      const res = await fetch(`${API}/images/upload`, { method: "POST", headers: authHeaders(), body: form });
+      const res = await fetch(`${API_URL}/images/upload`, { method: "POST", headers: getAuthHeaders(), body: form });
       if (!res.ok) { const err = await res.json(); throw new Error(err.message ?? "Upload failed"); }
       showToast("Image uploaded successfully");
       setUploadModal(false);
@@ -328,7 +348,7 @@ function MediaTab() {
   const handleDelete = async () => {
     if (!deleteImg) return;
     try {
-      const res = await fetch(`${API}/images/${deleteImg.id}`, { method: "DELETE", headers: authHeaders() });
+      const res = await fetch(`${API_URL}/images/${deleteImg.id}`, { method: "DELETE", headers: getAuthHeaders() });
       if (!res.ok) throw new Error("Delete failed");
       showToast("Image deleted");
       setDeleteImg(null);
@@ -601,9 +621,9 @@ function EditImageModal({ image, categories, onClose, onSaved }: {
         form.append("file", newFile);
         form.append("category", category);
         form.append("title", title);
-        const uploadRes = await fetch(`${API}/images/upload`, {
+        const uploadRes = await fetch(`${API_URL}/images/upload`, {
           method: "POST",
-          headers: authHeaders(),
+          headers: getAuthHeaders(),
           body: form,
         });
         if (!uploadRes.ok) {
@@ -614,15 +634,15 @@ function EditImageModal({ image, categories, onClose, onSaved }: {
         updatedUrl = uploaded.url;
 
         // Delete the old image record since we have a new one with the right metadata
-        await fetch(`${API}/images/${image.id}`, {
+        await fetch(`${API_URL}/images/${image.id}`, {
           method: "DELETE",
-          headers: authHeaders(),
+          headers: getAuthHeaders(),
         });
       } else {
         // Step 2: metadata-only update via PATCH
-        const res = await fetch(`${API}/images/${image.id}`, {
+        const res = await fetch(`${API_URL}/images/${image.id}`, {
           method: "PATCH",
-          headers: { ...authHeaders(), "Content-Type": "application/json" },
+          headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
           body: JSON.stringify({ title, description, category, isActive }),
         });
         if (!res.ok) throw new Error("Update failed");
@@ -722,7 +742,7 @@ function MessagesTab() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/messages/all`, { headers: authHeaders() });
+      const res = await fetch(`${API_URL}/messages/all`, { headers: getAuthHeaders() });
       if (!res.ok) throw new Error();
       setMessages(await res.json());
     } catch { setMessages([]); }
@@ -733,9 +753,9 @@ function MessagesTab() {
 
   const markAsRead = async (id: number) => {
     try {
-      await fetch(`${API}/messages/${id}/read`, {
+      await fetch(`${API_URL}/messages/${id}/read`, {
         method: "PATCH",
-        headers: authHeaders(),
+        headers: getAuthHeaders(),
       });
       load();
     } catch (e: any) { showToast("Failed to update"); }
@@ -744,9 +764,9 @@ function MessagesTab() {
   const handleDelete = async () => {
     if (!deleteMsg) return;
     try {
-      const res = await fetch(`${API}/messages/${deleteMsg.id}`, { 
+      const res = await fetch(`${API_URL}/messages/${deleteMsg.id}`, { 
         method: "DELETE", 
-        headers: authHeaders() 
+        headers: getAuthHeaders() 
       });
       if (!res.ok) throw new Error("Delete failed");
       showToast("Message deleted");
@@ -940,7 +960,7 @@ function DonationsTab() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/donations`, { headers: authHeaders() });
+      const res = await fetch(`${API_URL}/donations`, { headers: getAuthHeaders() });
       if (!res.ok) throw new Error();
       setDonations(await res.json());
     } catch { setDonations([]); }
@@ -951,9 +971,9 @@ function DonationsTab() {
 
   const updateStatus = async (id: number, status: string) => {
     try {
-      const res = await fetch(`${API}/donations/${id}/status`, {
+      const res = await fetch(`${API_URL}/donations/${id}/status`, {
         method: "PATCH",
-        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error("Update failed");
@@ -1130,9 +1150,9 @@ function SettingsTab({ user, onUserUpdate }: { user: any; onUserUpdate: (u: any)
       const body: any = { name: name.trim(), email: email.trim() };
       if (newPw) body.password = newPw;
 
-      const res = await fetch(`${API}/auth/profile`, {
+      const res = await fetch(`${API_URL}/auth/profile`, {
         method: "PATCH",
-        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
@@ -1364,3 +1384,4 @@ function ConfirmModal({ title, body, onCancel, onConfirm }: { title: string; bod
     </div>
   );
 }
+

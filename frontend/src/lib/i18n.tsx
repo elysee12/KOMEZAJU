@@ -54,7 +54,7 @@ const translations: Record<Lang, Dict> = {
     "stats.province": "Province served",
     "stats.languages": "Languages spoken",
     "stats.impact": "Community impact",
-    "stats.legacy": "Years of Impact",
+    "stats.legacy": "Experience of Impact",
     "stats.legacyLabel": "Building communities since 2023",
     "mission.eyebrow": "Who we are",
     "mission.title1": "A grassroots movement",

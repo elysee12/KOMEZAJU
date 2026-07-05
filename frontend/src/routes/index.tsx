@@ -61,8 +61,7 @@ import benefImg4 from "../assets/static_images/INFINITYSTUDIO(13).jpg";
 import benefImg5 from "../assets/static_images/INFINITYSTUDIO(14).jpg";
 
 import { LANGS, useT, type Lang } from "../lib/i18n";
-
-const API = "http://localhost:3000";
+import { API_URL } from "../lib/api";
 
 /**
  * Fetches the first active image for a given category from the backend.
@@ -71,7 +70,7 @@ const API = "http://localhost:3000";
 function useRemoteImage(category: string, fallback: string): string {
   const [src, setSrc] = useState(fallback);
   useEffect(() => {
-    fetch(`${API}/images?category=${encodeURIComponent(category)}`)
+    fetch(`${API_URL}/images?category=${encodeURIComponent(category)}`)
       .then((r) => r.ok ? r.json() : [])
       .then((data: { url: string }[]) => {
         if (data.length > 0) setSrc(data[0].url);
@@ -1063,7 +1062,7 @@ function Contact() {
     setStatus("sending");
     setErrMsg("");
     try {
-      const res = await fetch("http://localhost:3000/contact", {
+      const res = await fetch(`${API_URL}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), email: email.trim(), message: msg.trim() }),
@@ -1521,7 +1520,7 @@ function DonateModal({ onClose }: { onClose: () => void }) {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const res = await fetch(`${API}/donations`, {
+      const res = await fetch(`${API_URL}/donations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1720,7 +1719,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
