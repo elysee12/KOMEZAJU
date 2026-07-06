@@ -46,7 +46,7 @@ const translations: Record<Lang, Dict> = {
     "hero.title2": "Uplift.",
     "hero.title3": "Move forward.",
     "hero.lede":
-      "KOMEZAJU is a Rwandan community organization promoting development through capacity building — for youth, for women, and for every neighbor ready to rise together.",
+      "KOMEZAJU is a national non-governmental organization (NGO) driving community development through capacity building for youth, women, and everyone ready to rise together.",
     "hero.missionLabel": "Our Mission",
     "hero.missionQuote": "\"To promote community development through capacity building.\"",
     "hero.missionSource": "Article 3 — Statutes",
@@ -112,7 +112,7 @@ const translations: Record<Lang, Dict> = {
     "lead.president": "President",
     "lead.deputy": "Deputy President",
     "lead.presidentBio":
-      "Founder and President of KOMEZAJU Organization, leading community development across Bugesera.",
+      "President of KOMEZAJU Organization, leading community development across Bugesera.",
     "lead.deputyBio":
       "Deputy President supporting program delivery, partnerships and grassroots engagement.",
     "contact.eyebrow": "Get in touch",
@@ -187,7 +187,7 @@ const translations: Record<Lang, Dict> = {
     "hero.title2": "Hagurutsa.",
     "hero.title3": "Tera intambwe.",
     "hero.lede":
-      "KOMEZAJU ni umuryango nyarwanda uharanira iterambere ry'abaturage binyuze mu kubaka ubushobozi — bw'urubyiruko, bw'abagore, n'umuturanyi wese witeguye gutera intambwe twese hamwe.",
+      "KOMEZAJU ni umuryango nyarwanda utegamiye kuri Leta (NGO) uharanira iterambere ry'abaturage binyuze mu kubaka ubushobozi — bw'urubyiruko, bw'abagore, n'umuntu wese witeguye gutera intambwe twese hamwe.",
     "hero.missionLabel": "Intego Yacu",
     "hero.missionQuote": "\"Guteza imbere iterambere ry'umuturage binyuze mu kubaka ubushobozi.\"",
     "hero.missionSource": "Ingingo ya 3 — Amategeko Shingiro",
@@ -254,7 +254,7 @@ const translations: Record<Lang, Dict> = {
     "lead.president": "Perezida",
     "lead.deputy": "Visi Perezida",
     "lead.presidentBio":
-      "Uwashinze akaba na Perezida wa KOMEZAJU, ayobora iterambere ry'abaturage muri Bugesera.",
+      "Perezida wa KOMEZAJU, ayobora iterambere ry'abaturage muri Bugesera.",
     "lead.deputyBio":
       "Visi Perezida ushyigikira ishyirwa mu bikorwa rya gahunda, ubufatanye n'imikoranire n'abaturage.",
     "contact.eyebrow": "Tuvugishe",
@@ -329,7 +329,7 @@ const translations: Record<Lang, Dict> = {
     "hero.title2": "Élever.",
     "hero.title3": "Avancer.",
     "hero.lede":
-      "KOMEZAJU est une organisation communautaire rwandaise qui promeut le développement par le renforcement des capacités — pour la jeunesse, les femmes et chaque voisin prêt à se lever avec nous.",
+      "KOMEZAJU est une organisation non gouvernementale (ONG) nationale qui conduit le développement communautaire par le renforcement des capacités pour la jeunesse, les femmes et chaque voisin prêt à se lever avec nous.",
     "hero.missionLabel": "Notre Mission",
     "hero.missionQuote":
       "« Promouvoir le développement communautaire par le renforcement des capacités. »",
@@ -405,7 +405,7 @@ const translations: Record<Lang, Dict> = {
     "lead.president": "Présidente",
     "lead.deputy": "Vice-Président",
     "lead.presidentBio":
-      "Fondatrice et Présidente de KOMEZAJU, à la tête du développement communautaire à Bugesera.",
+      "Présidente de KOMEZAJU, à la tête du développement communautaire à Bugesera.",
     "lead.deputyBio":
       "Vice-Président soutenant la mise en œuvre des programmes, les partenariats et l'engagement de terrain.",
     "contact.eyebrow": "Contactez-nous",
