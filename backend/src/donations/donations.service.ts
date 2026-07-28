@@ -56,7 +56,6 @@ export class DonationsService {
     const [
       totalDonations,
       monthlyTotal,
-      mediaCount,
       recentDonations,
     ] = await Promise.all([
       this.prisma.donation.count(),
@@ -64,7 +63,6 @@ export class DonationsService {
         _sum: { amount: true },
         where: { createdAt: { gte: startOfMonth } },
       }),
-      this.prisma.image.count({ where: { isActive: true } }),
       this.prisma.donation.findMany({
         orderBy: { createdAt: 'desc' },
         take: 5,
@@ -83,7 +81,6 @@ export class DonationsService {
     return {
       totalDonations,
       monthlyTotal: Number(monthlyTotal._sum.amount ?? 0),
-      mediaCount,
       recentDonations,
     };
   }

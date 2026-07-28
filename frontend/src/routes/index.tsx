@@ -32,53 +32,45 @@ import {
   Gem,
 } from "lucide-react";
 
-import logo from "../assets/logo.png";
-import hero from "../assets/hero-community.jpg";
-import youthImg from "../assets/youth-training.jpg";
-import womenImg from "../assets/women-cooperative.jpg";
-import envImg from "../assets/environment.jpg";
-import beneficiariesImg from "../assets/beneficiaries.jpg";
-import leaderPresident from "../assets/leader-president.jpg";
-import leaderDeputy from "../assets/leader-deputy.jpg";
+// Static image imports - organized by category
+import logo from "../assets/images/general/logo.png";
 
-// Import static images for programs
-import progImg1 from "../assets/static_images/INFINITYSTUDIO.jpg";
-import progImg2 from "../assets/static_images/INFINITYSTUDIO(1).jpg";
-import progImg3 from "../assets/static_images/INFINITYSTUDIO(2).jpg";
-import progImg4 from "../assets/static_images/INFINITYSTUDIO(3).jpg";
-import progImg5 from "../assets/static_images/INFINITYSTUDIO(4).jpg";
-import progImg6 from "../assets/static_images/INFINITYSTUDIO(5).jpg";
-import progImg7 from "../assets/static_images/INFINITYSTUDIO(6).jpg";
-import progImg8 from "../assets/static_images/INFINITYSTUDIO(7).jpg";
-import progImg9 from "../assets/static_images/INFINITYSTUDIO(8).jpg";
-import progImg10 from "../assets/static_images/INFINITYSTUDIO(9).jpg";
+// Hero section
+import hero from "../assets/images/hero/hero-community.jpg";
 
-// Import static images for beneficiaries
-import benefImg1 from "../assets/static_images/INFINITYSTUDIO(10).jpg";
-import benefImg2 from "../assets/static_images/INFINITYSTUDIO(11).jpg";
-import benefImg3 from "../assets/static_images/INFINITYSTUDIO(12).jpg";
-import benefImg4 from "../assets/static_images/INFINITYSTUDIO(13).jpg";
-import benefImg5 from "../assets/static_images/INFINITYSTUDIO(14).jpg";
+// Mission section
+import youthImg from "../assets/images/mission/youth-training.jpg";
+import womenImg from "../assets/images/mission/women-cooperative.jpg";
+import envImg from "../assets/images/mission/environment.jpg";
+
+// Beneficiaries section
+import beneficiariesImg from "../assets/images/beneficiaries/beneficiaries-main.jpg";
+
+// Leadership section
+import leaderPresident from "../assets/images/leadership/leader-president.jpg";
+import leaderDeputy from "../assets/images/leadership/leader-deputy.jpg";
+
+// Programs images
+import progImg1 from "../assets/images/programs/youth-empowerment.jpg";
+import progImg2 from "../assets/images/programs/job-creation.jpg";
+import progImg3 from "../assets/images/programs/cooperatives.jpg";
+import progImg4 from "../assets/images/programs/human-rights.jpg";
+import progImg5 from "../assets/images/programs/drug-prevention.jpg";
+import progImg6 from "../assets/images/programs/environment.jpg";
+import progImg7 from "../assets/images/programs/debates.jpg";
+import progImg8 from "../assets/images/programs/community-voice.jpg";
+import progImg9 from "../assets/images/programs/mediation.jpg";
+import progImg10 from "../assets/images/programs/partnerships.jpg";
+
+// Beneficiaries images
+import benefImg1 from "../assets/images/beneficiaries/youth.jpg";
+import benefImg2 from "../assets/images/beneficiaries/women.jpg";
+import benefImg3 from "../assets/images/beneficiaries/disability.jpg";
+import benefImg4 from "../assets/images/beneficiaries/teen-mothers.jpg";
+import benefImg5 from "../assets/images/beneficiaries/vulnerable-people.jpg";
 
 import { LANGS, useT, type Lang } from "../lib/i18n";
 import { API_URL } from "../lib/api";
-
-/**
- * Fetches the first active image for a given category from the backend.
- * Falls back to the provided local asset if no backend image is found.
- */
-function useRemoteImage(category: string, fallback: string): string {
-  const [src, setSrc] = useState(fallback);
-  useEffect(() => {
-    fetch(`${API_URL}/images?category=${encodeURIComponent(category)}`)
-      .then((r) => r.ok ? r.json() : [])
-      .then((data: { url: string }[]) => {
-        if (data.length > 0) setSrc(data[0].url);
-      })
-      .catch(() => {/* silently keep fallback */});
-  }, [category, fallback]);
-  return src;
-}
 
 const NAV = [
   { 
@@ -109,29 +101,29 @@ const NAV = [
 ];
 
 const BENEFICIARIES = [
-  { icon: GraduationCap, k: "youth", img: benefImg1, category: "beneficiary-youth" },
-  { icon: HeartHandshake, k: "women", img: benefImg2, category: "beneficiary-women" },
-  { icon: ShieldCheck, k: "disability", img: benefImg3, category: "beneficiary-disability" },
-  { icon: HandHeart, k: "teen", img: benefImg4, category: "beneficiary-teen" },
-  { icon: Users, k: "vulnerable", img: benefImg5, category: "beneficiary-vulnerable" },
+  { icon: GraduationCap, k: "youth", img: benefImg1 },
+  { icon: HeartHandshake, k: "women", img: benefImg2 },
+  { icon: ShieldCheck, k: "disability", img: benefImg3 },
+  { icon: HandHeart, k: "teen", img: benefImg4 },
+  { icon: Users, k: "vulnerable", img: benefImg5 },
 ];
 
 const ACTIVITIES = [
-  { icon: Users, k: "youth", img: progImg1, category: "program-youth" },
-  { icon: Briefcase, k: "jobs", img: progImg2, category: "program-jobs" },
-  { icon: HeartHandshake, k: "coops", img: progImg3, category: "program-coops" },
-  { icon: ShieldCheck, k: "rights", img: progImg4, category: "program-rights" },
-  { icon: Sprout, k: "drug", img: progImg5, category: "program-drug" },
-  { icon: Leaf, k: "env", img: progImg6, category: "program-env" },
-  { icon: Megaphone, k: "debates", img: progImg7, category: "program-debates" },
-  { icon: HandHeart, k: "voice", img: progImg8, category: "program-voice" },
-  { icon: GraduationCap, k: "mediation", img: progImg9, category: "program-mediation" },
-  { icon: Network, k: "partners", img: progImg10, category: "program-partners" },
+  { icon: Users, k: "youth", img: progImg1 },
+  { icon: Briefcase, k: "jobs", img: progImg2 },
+  { icon: HeartHandshake, k: "coops", img: progImg3 },
+  { icon: ShieldCheck, k: "rights", img: progImg4 },
+  { icon: Sprout, k: "drug", img: progImg5 },
+  { icon: Leaf, k: "env", img: progImg6 },
+  { icon: Megaphone, k: "debates", img: progImg7 },
+  { icon: HandHeart, k: "voice", img: progImg8 },
+  { icon: GraduationCap, k: "mediation", img: progImg9 },
+  { icon: Network, k: "partners", img: progImg10 },
 ];
 
 // Shared constants for contact widgets
 const WHATSAPP_NUMBER = "250788911933"; // international format, no +
-const WHATSAPP_MSG = "Hello KOMEZAJU, I'd like to learn more about your work.";
+const WHATSAPP_MSG = "[WEBSITE INQUIRY] Hello KOMEZAJU! I'm reaching out through your website. I'd like to learn more about your work.";
 const ORG_LAT = -2.1486;
 const ORG_LNG = 30.0931;
 
@@ -313,7 +305,7 @@ function Header({ onDonate, onLogin }: { onDonate: () => void; onLogin: () => vo
                       {t(n.key)}
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isActive ? "rotate-180" : ""}`} />
                     </button>
-                    {isActive && (
+                    {isActive && n.dropdown && (
                       <div className="absolute left-0 top-full mt-2 w-56 animate-fade-up">
                         <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-elevated backdrop-blur-xl">
                           {n.dropdown.map((item) => (
@@ -392,7 +384,7 @@ function Header({ onDonate, onLogin }: { onDonate: () => void; onLogin: () => vo
                       {t(n.key)}
                     </p>
                     <div className="mt-2 space-y-2">
-                      {n.dropdown.map((item) => (
+                      {n.dropdown?.map((item) => (
                         <a
                           key={item.href}
                           href={item.href}
@@ -452,72 +444,117 @@ function Header({ onDonate, onLogin }: { onDonate: () => void; onLogin: () => vo
 
 function Hero({ onDonate }: { onDonate: () => void }) {
   const { t } = useT();
-  const heroImage = useRemoteImage("hero", hero);
   return (
     <section id="top" className="relative overflow-hidden pt-16 md:pt-20">
-      <div className="relative">
-        <img
-          src={heroImage}
-          alt="Members of the Bugesera community gathered at sunset"
-          width={1920}
-          height={1080}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: "var(--gradient-hero-overlay)" }}
-        />
-        <div className="relative container-x grid min-h-[640px] grid-cols-1 items-center gap-12 py-20 md:min-h-[760px] md:py-28 lg:grid-cols-12">
-          <div className="text-white lg:col-span-7 animate-fade-up">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.18em] backdrop-blur">
-              <Star className="h-3.5 w-3.5 fill-accent text-accent" />
-              {t("hero.badge")}
-            </div>
-            <h1 className="mt-6 text-4xl font-semibold leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl">
-              {t("hero.title1")} <span className="text-accent">{t("hero.title2")}</span>
-              <br /> {t("hero.title3")}
-            </h1>
-            <p className="mt-6 max-w-xl text-base text-white/85 sm:text-lg">{t("hero.lede")}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#programs"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110"
-              >
-                {t("cta.explore")} <ArrowRight className="h-4 w-4" />
-              </a>
-              <button
-                type="button"
-                onClick={onDonate}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-foreground shadow-soft transition hover:bg-white/90"
-              >
-                <Heart className="h-4 w-4 text-primary" /> {t("cta.donate")}
-              </button>
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
-              >
-                {t("cta.partner")}
-              </a>
-            </div>
+      {/* Split-screen layout - 65% image, 35% content */}
+      <div className="relative grid min-h-[550px] grid-cols-1 md:min-h-[600px] lg:grid-cols-12">
+        {/* Left side - Image (65% on desktop) - object-contain to show full image */}
+        <div className="relative bg-gray-100 lg:col-span-8">
+          <img
+            src={hero}
+            alt="Members of the Bugesera community gathered at sunset"
+            width={1920}
+            height={1080}
+            className="absolute inset-0 h-full w-full object-contain"
+          />
+        </div>
+
+        {/* Right side - Content (35% on desktop) */}
+        <div className="relative flex flex-col justify-center bg-background px-6 py-12 md:px-8 md:py-16 lg:col-span-4 lg:px-8 xl:px-10">
+          {/* Badge - fade in */}
+          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-primary animate-fade-up">
+            <Star className="h-3 w-3 fill-primary text-primary" />
+            {t("hero.badge")}
           </div>
 
-          <div className="hidden lg:col-span-5 lg:block">
-            <div className="ml-auto max-w-sm rounded-3xl border border-white/20 bg-white/10 p-6 text-white shadow-elevated backdrop-blur-xl animate-float-soft">
-              <p className="text-xs uppercase tracking-[0.18em] text-white/70">
-                {t("hero.missionLabel")}
-              </p>
-              <p className="mt-3 font-display text-2xl leading-snug">{t("hero.missionQuote")}</p>
-              <div className="mt-5 flex items-center gap-3 border-t border-white/20 pt-4">
-                <img src={logo} alt="" className="h-9 w-9 rounded-full bg-white p-1" />
-                <div className="text-sm">
-                  <p className="font-semibold">KOMEZAJU Organization</p>
-                  <p className="text-white/70">{t("hero.missionSource")}</p>
+          {/* Title with animated gradient - logo colors */}
+          <h1 className="mt-5 text-3xl font-semibold leading-[1.15] md:text-4xl lg:text-[2.5rem] animate-fade-up" style={{ animationDelay: '0.1s' }}>
+            <span className="inline-block animate-gradient bg-gradient-to-r from-primary via-accent to-secondary bg-[length:200%_auto] bg-clip-text text-transparent">
+              {t("hero.title1")}
+            </span>{" "}
+            <span className="inline-block animate-gradient bg-gradient-to-r from-accent via-secondary to-primary bg-[length:200%_auto] bg-clip-text text-transparent" style={{ animationDelay: '0.5s' }}>
+              {t("hero.title2")}
+            </span>{" "}
+            <span className="inline-block text-foreground">
+              {t("hero.title3")}
+            </span>
+          </h1>
+
+          {/* Description - justified text */}
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-justify md:text-base animate-fade-up" style={{ animationDelay: '0.2s' }}>
+            {t("hero.lede")}
+          </p>
+
+          {/* CTAs - fade in */}
+          <div className="mt-6 flex flex-wrap gap-2.5 animate-fade-up" style={{ animationDelay: '0.3s' }}>
+            <a
+              href="#programs"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-accent px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:shadow-md hover:brightness-110"
+            >
+              {t("cta.explore")} <ArrowRight className="h-4 w-4" />
+            </a>
+            <button
+              type="button"
+              onClick={onDonate}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground shadow-sm transition hover:bg-muted"
+            >
+              <Heart className="h-4 w-4 text-primary" /> {t("cta.donate")}
+            </button>
+          </div>
+
+          {/* Mission card - compact and refined */}
+          <div className="mt-8 rounded-xl border border-border/40 bg-gradient-to-br from-white to-gray-50/50 p-4 shadow-sm animate-fade-up" style={{ animationDelay: '0.4s' }}>
+            <div className="flex items-start gap-3">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white shadow-sm ring-1 ring-black/5">
+                  <img src={logo} alt="KOMEZAJU logo" className="h-6 w-6" />
+                </div>
+              </div>
+              
+              {/* Text */}
+              <div className="flex-1">
+                {/* Label */}
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 ring-1 ring-primary/15">
+                  <div className="h-1 w-1 rounded-full bg-primary animate-pulse" />
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                    {t("hero.missionLabel")}
+                  </p>
+                </div>
+                
+                {/* Quote - justified */}
+                <p className="mt-2 font-display text-sm font-medium leading-snug text-gray-900 text-justify md:text-base">
+                  {t("hero.missionQuote")}
+                </p>
+                
+                {/* Source */}
+                <div className="mt-2 flex items-center gap-2 border-t border-gray-200/60 pt-2">
+                  <div className="flex h-0.5 w-6 rounded-full bg-gradient-to-r from-primary to-accent" />
+                  <p className="text-[10px] font-medium text-gray-600">
+                    {t("hero.missionSource")}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* CSS for gradient animation */}
+      <style>{`
+        @keyframes gradient {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+        
+        .animate-gradient {
+          animation: gradient 3s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   );
 }
@@ -600,9 +637,6 @@ function TrustStrip() {
 
 function Mission() {
   const { t } = useT();
-  const womenSrc = useRemoteImage("mission-women", womenImg);
-  const envSrc   = useRemoteImage("mission-environment", envImg);
-  const youthSrc = useRemoteImage("mission-youth", youthImg);
   return (
     <section id="mission" className="py-16 md:py-20">
       <div className="container-x grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
@@ -626,7 +660,7 @@ function Mission() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-4">
               <img
-                src={womenSrc}
+                src={womenImg}
                 alt="Women cooperative members in Bugesera"
                 loading="lazy"
                 width={1024}
@@ -634,7 +668,7 @@ function Mission() {
                 className="aspect-[3/4] w-full rounded-3xl object-cover shadow-soft"
               />
               <img
-                src={envSrc}
+                src={envImg}
                 alt="Hands planting a tree"
                 loading="lazy"
                 width={1024}
@@ -644,7 +678,7 @@ function Mission() {
             </div>
             <div className="mt-12 space-y-4">
               <img
-                src={youthSrc}
+                src={youthImg}
                 alt="Youth in vocational training"
                 loading="lazy"
                 width={1024}
@@ -777,7 +811,6 @@ function Programs() {
 
 function ProgramCard({ activity: a, index: i }: { activity: typeof ACTIVITIES[0]; index: number }) {
   const { t } = useT();
-  const imageSrc = useRemoteImage(a.category, a.img);
   
   return (
     <article 
@@ -786,7 +819,7 @@ function ProgramCard({ activity: a, index: i }: { activity: typeof ACTIVITIES[0]
       {/* Image Container with Overlay */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <img 
-          src={imageSrc} 
+          src={a.img} 
           alt={t(`act.${a.k}.t`)}
           className="h-full w-full object-cover object-center transition-all duration-700 group-hover:scale-110 group-hover:brightness-90"
         />
@@ -833,14 +866,13 @@ function ProgramCard({ activity: a, index: i }: { activity: typeof ACTIVITIES[0]
 
 function Impact() {
   const { t } = useT();
-  const impactSrc = useRemoteImage("impact", beneficiariesImg);
   return (
     <section id="impact" className="py-16 md:py-20">
       <div className="container-x grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div className="relative">
           <div className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20 blur-2xl" />
           <img
-            src={impactSrc}
+            src={beneficiariesImg}
             alt="Community gathering"
             loading="lazy"
             width={1600}
@@ -929,7 +961,6 @@ function Beneficiaries() {
 
 function BeneficiaryCard({ beneficiary: b, index: i }: { beneficiary: typeof BENEFICIARIES[0]; index: number }) {
   const { t } = useT();
-  const imageSrc = useRemoteImage(b.category, b.img);
   
   return (
     <article
@@ -938,7 +969,7 @@ function BeneficiaryCard({ beneficiary: b, index: i }: { beneficiary: typeof BEN
       {/* Image Container with Overlay */}
       <div className="relative aspect-[3/4] overflow-hidden">
         <img 
-          src={imageSrc} 
+          src={b.img} 
           alt={t(`ben.${b.k}.t`)}
           className="h-full w-full object-cover object-center transition-all duration-700 group-hover:scale-110"
         />
@@ -990,20 +1021,18 @@ function BeneficiaryCard({ beneficiary: b, index: i }: { beneficiary: typeof BEN
 
 function Leadership() {
   const { t } = useT();
-  const presidentSrc = useRemoteImage("leadership-president", leaderPresident);
-  const deputySrc    = useRemoteImage("leadership-deputy", leaderDeputy);
   const team = [
     {
       name: "Mukayiranga Epiphanie",
       role: t("lead.president"),
       bio: t("lead.presidentBio"),
-      photo: presidentSrc,
+      photo: leaderPresident,
     },
     {
       name: "Nkurunziza Ndengeyintwari Emmanuel",
       role: t("lead.deputy"),
       bio: t("lead.deputyBio"),
-      photo: deputySrc,
+      photo: leaderDeputy,
     },
   ];
   return (

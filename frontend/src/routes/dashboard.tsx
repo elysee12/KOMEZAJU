@@ -6,7 +6,7 @@ import {
   Upload, Trash2, CheckCircle, Clock,
   Download, X, Pencil, RefreshCw, AlertCircle,
 } from "lucide-react";
-import logo from "../assets/logo.png";
+import logo from "../assets/images/general/logo.png";
 import { API_URL, getAuthHeaders, isAuthenticated, clearAuth } from "../lib/api";
 
 export const Route = createFileRoute("/dashboard")({
@@ -32,11 +32,10 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
 });
 
-type Tab = "overview" | "media" | "donations" | "messages" | "settings";
+type Tab = "overview" | "donations" | "messages" | "settings";
 
 const NAV = [
   { id: "overview",  icon: LayoutDashboard, label: "Overview"       },
-  { id: "media",     icon: ImagePlus,       label: "Media Library"  },
   { id: "donations", icon: HeartHandshake,  label: "Donations"      },
   { id: "messages",  icon: MessageSquare,   label: "Messages"       },
   { id: "settings",  icon: Settings,        label: "Settings"       },
@@ -58,7 +57,7 @@ interface ContactMessage {
 }
 interface Stats {
   totalDonations: number; monthlyTotal: number;
-  mediaCount: number; recentDonations: Donation[];
+  recentDonations: Donation[];
   messagesCount?: number; unreadMessages?: number;
 }
 
@@ -156,7 +155,6 @@ function DashboardPage() {
           </header>
           <main className="mx-auto max-w-7xl p-6 md:p-10">
             {activeTab === "overview"  && <OverviewTab  onNavigate={setActiveTab} />}
-            {activeTab === "media"     && <MediaTab />}
             {activeTab === "donations" && <DonationsTab />}
             {activeTab === "messages"  && <MessagesTab />}
             {activeTab === "settings"  && <SettingsTab user={user} onUserUpdate={(u) => setUser(u)} />}
@@ -208,20 +206,18 @@ function OverviewTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   const statCards = [
     { label: "Total Donations",     value: stats!.totalDonations.toString(),          icon: HeartHandshake, color: "text-emerald-600", bg: "bg-emerald-50", action: () => onNavigate("donations") },
     { label: "Revenue This Month",  value: `$${stats!.monthlyTotal.toLocaleString()}`, icon: TrendingUp,     color: "text-blue-600",    bg: "bg-blue-50",    action: () => onNavigate("donations") },
-    { label: "Media Files",         value: stats!.mediaCount.toString(),               icon: ImagePlus,      color: "text-purple-600",  bg: "bg-purple-50",  action: () => onNavigate("media")     },
     { label: "Messages",            value: `${stats!.messagesCount ?? 0}`,             icon: MessageSquare,  color: "text-amber-600",   bg: "bg-amber-50",   action: () => onNavigate("messages"), badge: stats!.unreadMessages },
   ];
 
   return (
     <div className="space-y-8">
-      <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {statCards.map((s) => {
+      <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">{statCards.map((s) => {
           const Icon = s.icon;
           return (
             <article key={s.label} onClick={s.action}
-              className={`relative rounded-2xl border border-border bg-card p-6 shadow-soft transition hover:shadow-elevated ${s.action ? "cursor-pointer" : ""}`}>
+              className="relative cursor-pointer rounded-2xl border border-border bg-card p-6 shadow-soft transition hover:shadow-elevated">
               <span className={`grid h-11 w-11 place-items-center rounded-xl ${s.bg} ${s.color}`}><Icon className="h-5 w-5" /></span>
-              {s.badge && s.badge > 0 && (
+              {s.badge !== undefined && s.badge > 0 && (
                 <span className="absolute right-4 top-4 flex h-6 min-w-[24px] items-center justify-center rounded-full bg-destructive px-2 text-xs font-bold text-destructive-foreground">
                   {s.badge}
                 </span>
@@ -264,15 +260,15 @@ function OverviewTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
         <article className="h-fit rounded-2xl border border-border bg-card p-7 shadow-soft">
           <h2 className="mb-5 font-display text-lg font-bold">Quick Actions</h2>
           <div className="space-y-3">
-            <button onClick={() => onNavigate("media")}
-              className="flex w-full items-center gap-4 rounded-xl border border-border bg-muted/30 p-4 text-left hover:border-primary/50 hover:bg-muted">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground"><Upload className="h-4 w-4" /></span>
-              <div><p className="text-sm font-bold">Upload Media</p><p className="text-xs text-muted-foreground">Manage homepage images</p></div>
-            </button>
             <button onClick={() => onNavigate("donations")}
               className="flex w-full items-center gap-4 rounded-xl border border-border bg-muted/30 p-4 text-left hover:border-primary/50 hover:bg-muted">
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500 text-white"><Eye className="h-4 w-4" /></span>
               <div><p className="text-sm font-bold">View Donors</p><p className="text-xs text-muted-foreground">Manage contributions</p></div>
+            </button>
+            <button onClick={() => onNavigate("messages")}
+              className="flex w-full items-center gap-4 rounded-xl border border-border bg-muted/30 p-4 text-left hover:border-primary/50 hover:bg-muted">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-amber-500 text-white"><MessageSquare className="h-4 w-4" /></span>
+              <div><p className="text-sm font-bold">View Messages</p><p className="text-xs text-muted-foreground">Check contact inquiries</p></div>
             </button>
           </div>
         </article>
@@ -281,455 +277,7 @@ function OverviewTab({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   );
 }
 
-// ─── MediaTab ─────────────────────────────────────────────────────────────────
-function MediaTab() {
-  const [images, setImages]       = useState<ImageRecord[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [editImg, setEditImg]     = useState<ImageRecord | null>(null);
-  const [deleteImg, setDeleteImg]   = useState<ImageRecord | null>(null);
-  const [uploadModal, setUploadModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("general");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [toast, setToast]         = useState<{ msg: string; ok: boolean } | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const showToast = (msg: string, ok = true) => {
-    setToast({ msg, ok });
-    setTimeout(() => setToast(null), 3500);
-  };
-
-  const loadImages = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/images/all`, { headers: getAuthHeaders() });
-      if (!res.ok) throw new Error();
-      setImages(await res.json());
-    } catch { setImages([]); }
-    finally { setLoading(false); }
-  }, []);
-
-  useEffect(() => { loadImages(); }, [loadImages]);
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // Validate size first (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      showToast("File too big! Maximum is 10MB", false);
-      return;
-    }
-    setSelectedFile(file);
-    setSelectedCategory("general");
-    setUploadModal(true);
-  };
-
-  const confirmUpload = async () => {
-    if (!selectedFile) return;
-    setUploading(true);
-    const form = new FormData();
-    form.append("file", selectedFile);
-    form.append("category", selectedCategory);
-    form.append("title", selectedFile.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "));
-    try {
-      const res = await fetch(`${API_URL}/images/upload`, { method: "POST", headers: getAuthHeaders(), body: form });
-      if (!res.ok) { const err = await res.json(); throw new Error(err.message ?? "Upload failed"); }
-      showToast("Image uploaded successfully");
-      setUploadModal(false);
-      setSelectedFile(null);
-      loadImages();
-    } catch (e: any) { showToast(e.message, false); }
-    finally { 
-      setUploading(false); 
-      if (fileRef.current) fileRef.current.value = ""; 
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteImg) return;
-    try {
-      const res = await fetch(`${API_URL}/images/${deleteImg.id}`, { method: "DELETE", headers: getAuthHeaders() });
-      if (!res.ok) throw new Error("Delete failed");
-      showToast("Image deleted");
-      setDeleteImg(null);
-      loadImages();
-    } catch (e: any) { showToast(e.message, false); }
-  };
-
-  const CATEGORIES = [
-    "hero", 
-    "mission-women", 
-    "mission-environment", 
-    "mission-youth", 
-    "beneficiaries", 
-    "impact", 
-    "leadership-president", 
-    "leadership-deputy",
-    // Programs categories
-    "program-youth",
-    "program-jobs",
-    "program-coops",
-    "program-rights",
-    "program-drug",
-    "program-env",
-    "program-debates",
-    "program-voice",
-    "program-mediation",
-    "program-partners",
-    // Beneficiaries categories
-    "beneficiary-youth",
-    "beneficiary-women",
-    "beneficiary-disability",
-    "beneficiary-teen",
-    "beneficiary-vulnerable",
-    "general"
-  ];
-
-  return (
-    <div className="space-y-6">
-      {toast && (
-        <div className={`fixed bottom-6 right-6 z-50 rounded-xl px-5 py-3 text-sm font-semibold shadow-elevated ${toast.ok ? "bg-foreground text-background" : "bg-destructive text-destructive-foreground"}`}>
-          {toast.msg}
-        </div>
-      )}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="font-display text-2xl font-bold">Media Library</h2>
-          <p className="text-sm text-muted-foreground">
-            Upload and manage images displayed on the homepage. Assign categories to control which section each image appears in.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={loadImages} title="Refresh" className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-card hover:bg-muted">
-            <RefreshCw className="h-4 w-4" />
-          </button>
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground hover:brightness-110">
-            <Upload className="h-4 w-4" />
-            {uploading ? "Uploading…" : "Upload Photo"}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
-          </label>
-        </div>
-      </div>
-
-      {/* Category legend */}
-      <div className="rounded-2xl border border-border bg-card shadow-soft">
-        <div className="flex items-center gap-2 border-b border-border/60 px-6 py-4">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
-            <ImagePlus className="h-4 w-4" />
-          </div>
-          <div>
-            <p className="text-sm font-bold">Category Guide</p>
-            <p className="text-xs text-muted-foreground">Assign a category to each image to control where it appears on the homepage</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-3 p-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            // Main sections
-            { cat: "hero",                 desc: "Hero background",         section: "Hero",           color: "bg-orange-50 text-orange-700 ring-orange-200"  },
-            { cat: "mission-women",        desc: "Women cooperative photo", section: "Mission",        color: "bg-pink-50 text-pink-700 ring-pink-200"         },
-            { cat: "mission-environment",  desc: "Environment photo",       section: "Mission",        color: "bg-emerald-50 text-emerald-700 ring-emerald-200"},
-            { cat: "mission-youth",        desc: "Youth training photo",    section: "Mission",        color: "bg-blue-50 text-blue-700 ring-blue-200"         },
-            { cat: "beneficiaries",        desc: "Beneficiaries portrait",  section: "Beneficiaries",  color: "bg-violet-50 text-violet-700 ring-violet-200"   },
-            { cat: "impact",               desc: "Community gathering",     section: "Impact",         color: "bg-amber-50 text-amber-700 ring-amber-200"      },
-            { cat: "leadership-president", desc: "President portrait",      section: "Leadership",     color: "bg-sky-50 text-sky-700 ring-sky-200"            },
-            { cat: "leadership-deputy",    desc: "Deputy portrait",         section: "Leadership",     color: "bg-indigo-50 text-indigo-700 ring-indigo-200"   },
-            // Programs
-            { cat: "program-youth",        desc: "Youth Empowerment card",  section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-jobs",         desc: "Job Creation card",       section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-coops",        desc: "Cooperatives card",       section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-rights",       desc: "Human Rights card",       section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-drug",         desc: "Drug Prevention card",    section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-env",          desc: "Environment card",        section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-debates",      desc: "Debates card",            section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-voice",        desc: "Community Voice card",    section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-mediation",    desc: "Mediation card",          section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            { cat: "program-partners",     desc: "Partnerships card",       section: "Programs",       color: "bg-cyan-50 text-cyan-700 ring-cyan-200"         },
-            // Beneficiaries
-            { cat: "beneficiary-youth",        desc: "Youth beneficiary card",      section: "Beneficiaries",  color: "bg-purple-50 text-purple-700 ring-purple-200" },
-            { cat: "beneficiary-women",        desc: "Women beneficiary card",      section: "Beneficiaries",  color: "bg-purple-50 text-purple-700 ring-purple-200" },
-            { cat: "beneficiary-disability",   desc: "Disability beneficiary card", section: "Beneficiaries",  color: "bg-purple-50 text-purple-700 ring-purple-200" },
-            { cat: "beneficiary-teen",         desc: "Teen mothers card",           section: "Beneficiaries",  color: "bg-purple-50 text-purple-700 ring-purple-200" },
-            { cat: "beneficiary-vulnerable",   desc: "Vulnerable people card",      section: "Beneficiaries",  color: "bg-purple-50 text-purple-700 ring-purple-200" },
-            { cat: "general",              desc: "Not shown on homepage",   section: "Hidden",         color: "bg-muted text-muted-foreground ring-border"     },
-          ].map(({ cat, desc, section, color }) => (
-            <div key={cat} className={`flex items-start gap-3 rounded-xl border p-4 ring-1 ${color}`}>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <code className="rounded-md bg-white/70 px-2 py-0.5 text-[11px] font-bold tracking-tight ring-1 ring-black/10">
-                    {cat}
-                  </code>
-                  <span className="shrink-0 rounded-full bg-white/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-black/10">
-                    {section}
-                  </span>
-                </div>
-                <p className="mt-1.5 text-xs font-medium leading-snug">{desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="py-20 text-center text-muted-foreground">Loading media…</div>
-      ) : images.length === 0 ? (
-        <div className="rounded-3xl border-2 border-dashed border-border bg-card p-20 text-center">
-          <ImagePlus className="mx-auto h-10 w-10 text-muted-foreground" />
-          <p className="mt-3 font-display text-lg font-bold">No images yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">Click "Upload Photo" to add your first image</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 xl:grid-cols-4">
-          {images.map((img) => (
-            <article key={img.id} className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
-              <img src={img.url} alt={img.title ?? ""} className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-105" />
-              {!img.isActive && (
-                <div className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-bold text-white">Hidden</div>
-              )}
-              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-transparent to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
-                <p className="truncate text-sm font-bold text-white">{img.title ?? "Untitled"}</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/70">{img.category ?? "general"}</p>
-                <div className="mt-2 flex gap-2">
-                  <button onClick={() => setEditImg(img)}
-                    className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-white py-1.5 text-xs font-bold text-foreground">
-                    <Pencil className="h-3 w-3" /> Edit
-                  </button>
-                  <button onClick={() => setDeleteImg(img)}
-                    className="grid h-8 w-8 place-items-center rounded-lg bg-destructive text-destructive-foreground">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-
-      {editImg && (
-        <EditImageModal image={editImg} categories={CATEGORIES}
-          onClose={() => setEditImg(null)}
-          onSaved={() => { setEditImg(null); loadImages(); showToast("Image updated"); }} />
-      )}
-      {deleteImg && (
-        <ConfirmModal
-          title="Delete image?"
-          body={`"${deleteImg.title ?? deleteImg.url}" will be permanently removed from the site.`}
-          onCancel={() => setDeleteImg(null)}
-          onConfirm={handleDelete} />
-      )}
-      {uploadModal && selectedFile && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center sm:p-6"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) { setUploadModal(false); setSelectedFile(null); } }}>
-          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-card shadow-elevated animate-fade-up">
-            <div className="p-7">
-              <div className="mb-5 flex items-center justify-between">
-                <h3 className="font-display text-xl font-bold">Upload New Photo</h3>
-                <button onClick={() => { setUploadModal(false); setSelectedFile(null); }}
-                  className="grid h-8 w-8 place-items-center rounded-full bg-muted hover:bg-foreground hover:text-background">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              
-              {/* Preview */}
-              <div className="mb-5 overflow-hidden rounded-xl border border-border">
-                <img src={URL.createObjectURL(selectedFile)} alt="Preview" 
-                  className="h-48 w-full object-cover" />
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Choose Category</label>
-                  <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="mt-1.5 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/15">
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
-                  <p className="mb-1 font-bold uppercase tracking-wider">Category Preview</p>
-                  {[
-                    ["hero", "Hero background"],
-                    ["mission-women", "Mission — Women photo"],
-                    ["mission-environment", "Mission — Environment photo"],
-                    ["mission-youth", "Mission — Youth photo"],
-                    ["beneficiaries", "Beneficiaries section"],
-                    ["impact", "Impact section"],
-                    ["leadership-president", "Leadership — President"],
-                    ["leadership-deputy", "Leadership — Deputy"],
-                    ["general", "Not shown on homepage"],
-                  ].map(([cat, desc]) => 
-                    cat === selectedCategory ? (
-                      <p key={cat} className="font-medium text-foreground">{desc}</p>
-                    ) : null
-                  )}
-                </div>
-              </div>
-              
-              <div className="mt-6 flex gap-3">
-                <button onClick={() => { setUploadModal(false); setSelectedFile(null); }}
-                  disabled={uploading}
-                  className="flex-1 rounded-xl border border-border py-2.5 text-sm font-bold hover:bg-muted disabled:opacity-50">
-                  Cancel
-                </button>
-                <button onClick={confirmUpload} disabled={uploading}
-                  className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground hover:brightness-110 disabled:opacity-50">
-                  {uploading ? "Uploading…" : "Upload Photo"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── EditImageModal ───────────────────────────────────────────────────────────
-function EditImageModal({ image, categories, onClose, onSaved }: {
-  image: ImageRecord; categories: string[];
-  onClose: () => void; onSaved: () => void;
-}) {
-  const [title, setTitle]         = useState(image.title ?? "");
-  const [description, setDesc]    = useState(image.description ?? "");
-  const [category, setCategory]   = useState(image.category ?? "general");
-  const [isActive, setActive]     = useState(image.isActive);
-  const [saving, setSaving]       = useState(false);
-  const [error, setError]         = useState<string | null>(null);
-  const [newFile, setNewFile]     = useState<File | null>(null);
-  const [preview, setPreview]     = useState<string>(image.url);
-  const fileRef                   = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setNewFile(file);
-    setPreview(URL.createObjectURL(file));
-    // Auto-fill title from filename if the title is still the default timestamp
-    if (!title || /^\d{10,}$/.test(title)) {
-      setTitle(file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "));
-    }
-  };
-
-  const save = async () => {
-    setSaving(true); setError(null);
-    try {
-      let updatedUrl = image.url;
-
-      // Step 1: if a new file was selected, upload it first
-      if (newFile) {
-        const form = new FormData();
-        form.append("file", newFile);
-        form.append("category", category);
-        form.append("title", title);
-        const uploadRes = await fetch(`${API_URL}/images/upload`, {
-          method: "POST",
-          headers: getAuthHeaders(),
-          body: form,
-        });
-        if (!uploadRes.ok) {
-          const err = await uploadRes.json().catch(() => ({}));
-          throw new Error(err.message ?? "File upload failed");
-        }
-        const uploaded = await uploadRes.json();
-        updatedUrl = uploaded.url;
-
-        // Delete the old image record since we have a new one with the right metadata
-        await fetch(`${API_URL}/images/${image.id}`, {
-          method: "DELETE",
-          headers: getAuthHeaders(),
-        });
-      } else {
-        // Step 2: metadata-only update via PATCH
-        const res = await fetch(`${API_URL}/images/${image.id}`, {
-          method: "PATCH",
-          headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
-          body: JSON.stringify({ title, description, category, isActive }),
-        });
-        if (!res.ok) throw new Error("Update failed");
-      }
-
-      onSaved();
-    } catch (e: any) { setError(e.message); }
-    finally { setSaving(false); }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="w-full max-w-md overflow-y-auto max-h-[90dvh] rounded-2xl bg-card p-7 shadow-elevated">
-        <div className="mb-5 flex items-center justify-between">
-          <h3 className="font-display text-xl font-bold">Edit Image</h3>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-full bg-muted hover:bg-foreground hover:text-background"><X className="h-4 w-4" /></button>
-        </div>
-
-        {/* Image preview + replace button */}
-        <div className="relative mb-5">
-          <img
-            src={preview}
-            alt=""
-            className="aspect-video w-full rounded-xl object-cover object-top"
-          />
-          <label className="absolute bottom-3 right-3 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-black/70 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur hover:bg-black/90">
-            <Upload className="h-3.5 w-3.5" />
-            {newFile ? "Change photo" : "Replace photo"}
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-          </label>
-        </div>
-
-        {newFile && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
-            <ImagePlus className="h-4 w-4 shrink-0" />
-            <span className="truncate">New file selected: <strong>{newFile.name}</strong></span>
-            <button
-              type="button"
-              onClick={() => { setNewFile(null); setPreview(image.url); if (fileRef.current) fileRef.current.value = ""; }}
-              className="ml-auto shrink-0 text-muted-foreground hover:text-destructive"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
-
-        {error && <p className="mb-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
-
-        <div className="space-y-4">
-          <Field label="Title" value={title} onChange={setTitle} />
-          <Field label="Description" value={description} onChange={setDesc} textarea />
-          <div>
-            <label className="text-sm font-medium">Category (controls where this appears on homepage)</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/15">
-              {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <label className="flex cursor-pointer items-center gap-3">
-            <div className={`relative h-6 w-11 rounded-full transition ${isActive ? "bg-primary" : "bg-muted"}`}
-              onClick={() => setActive((v) => !v)}>
-              <div className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${isActive ? "translate-x-5" : "translate-x-1"}`} />
-            </div>
-            <span className="text-sm font-medium">{isActive ? "Visible on site" : "Hidden from site"}</span>
-          </label>
-        </div>
-
-        <div className="mt-6 flex gap-3">
-          <button onClick={onClose} className="flex-1 rounded-xl border border-border py-2.5 text-sm font-bold hover:bg-muted">Cancel</button>
-          <button onClick={save} disabled={saving}
-            className="flex-1 rounded-xl bg-foreground py-2.5 text-sm font-bold text-background hover:bg-foreground/90 disabled:opacity-50">
-            {saving ? (newFile ? "Uploading…" : "Saving…") : "Save Changes"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── MessagesTab ──────────────────────────────────────────────────────────────
+// ─── DonationsTab ─────────────────────────────────────────────────────────────
 function MessagesTab() {
   const [messages, setMessages]   = useState<ContactMessage[]>([]);
   const [loading, setLoading]     = useState(true);
@@ -1307,7 +855,7 @@ function SettingsTab({ user, onUserUpdate }: { user: any; onUserUpdate: (u: any)
       {/* API info */}
       <article className="rounded-2xl border border-border bg-card p-6 shadow-soft">
         <h3 className="mb-2 font-display text-sm font-bold text-muted-foreground uppercase tracking-wider">API Connection</h3>
-        <p className="text-sm">Backend: <code className="rounded-lg bg-muted px-2 py-0.5 text-xs">{API}</code></p>
+        <p className="text-sm">Backend: <code className="rounded-lg bg-muted px-2 py-0.5 text-xs">{API_URL}</code></p>
       </article>
     </div>
   );

@@ -27,7 +27,7 @@ import {
   HiOutlineLightningBolt,
 } from "react-icons/hi";
 import { FaWhatsapp, FaMapMarkerAlt } from "react-icons/fa";
-import logo from "../assets/logo.png";
+import logo from "../assets/images/general/logo.png";
 import hero from "../assets/hero-community.jpg";
 import youthImg from "../assets/youth-training.jpg";
 import womenImg from "../assets/women-cooperative.jpg";

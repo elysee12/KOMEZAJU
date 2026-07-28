@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { HiOutlineMenu, HiOutlineX, HiOutlineLockClosed, HiOutlineHeart, HiOutlineArrowRight } from "react-icons/hi";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/images/general/logo.png";
 import { useT } from "../../lib/i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 

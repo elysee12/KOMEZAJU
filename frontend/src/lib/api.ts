@@ -7,6 +7,19 @@
 
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// Debug: Log the API_URL to console
+console.log("🔧 API Configuration:");
+console.log("  VITE_API_URL from env:", import.meta.env.VITE_API_URL);
+console.log("  Final API_URL:", API_URL);
+console.log("  Expected: http://localhost:3000");
+
+if (API_URL !== "http://localhost:3000") {
+  console.error("❌ API_URL is incorrect! Expected http://localhost:3000 but got:", API_URL);
+  console.error("   Please restart the dev server after changing .env file");
+} else {
+  console.log("✅ API_URL is correct!");
+}
+
 /**
  * Get authentication headers for API requests
  */
