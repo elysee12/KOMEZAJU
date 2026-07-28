@@ -446,21 +446,21 @@ function Hero({ onDonate }: { onDonate: () => void }) {
   const { t } = useT();
   return (
     <section id="top" className="relative overflow-hidden pt-16 md:pt-20">
-      {/* Split-screen layout - 65% image, 35% content */}
-      <div className="relative grid min-h-[550px] grid-cols-1 md:min-h-[600px] lg:grid-cols-12">
-        {/* Left side - Image (65% on desktop) - object-contain to show full image */}
-        <div className="relative bg-gray-100 lg:col-span-8">
+      {/* Responsive layout: Vertical stack on mobile, side-by-side on desktop */}
+      <div className="relative flex min-h-[550px] flex-col md:min-h-[600px] lg:flex-row">
+        {/* Image section - Shows on top for mobile, left side for desktop (65%) */}
+        <div className="relative h-[300px] w-full shrink-0 bg-gray-100 md:h-[400px] lg:h-auto lg:w-[65%]">
           <img
             src={hero}
             alt="Members of the Bugesera community gathered at sunset"
             width={1920}
             height={1080}
-            className="absolute inset-0 h-full w-full object-contain"
+            className="h-full w-full object-contain"
           />
         </div>
 
-        {/* Right side - Content (35% on desktop) */}
-        <div className="relative flex flex-col justify-center bg-background px-6 py-12 md:px-8 md:py-16 lg:col-span-4 lg:px-8 xl:px-10">
+        {/* Content section - Shows below image on mobile, right side on desktop (35%) */}
+        <div className="relative flex flex-col justify-center bg-background px-6 py-8 md:px-10 md:py-12 lg:w-[35%] lg:px-8 xl:px-10">
           {/* Badge - fade in */}
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-primary animate-fade-up">
             <Star className="h-3 w-3 fill-primary text-primary" />
