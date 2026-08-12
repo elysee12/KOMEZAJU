@@ -1132,8 +1132,8 @@ function Contact() {
                 <ContactRow
                   icon={Mail}
                   label={t("contact.email")}
-                  value="komezaju@gmail.com"
-                  href="mailto:komezaju@gmail.com"
+                  value="komezajuorganization1@gmail.com"
+                  href="mailto:komezajuorganization1@gmail.com"
                 />
                 <ContactRow
                   icon={MapPin}
@@ -1405,8 +1405,8 @@ function Footer() {
             </p>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="mailto:komezaju@gmail.com" className="transition hover:text-primary">
-                  komezaju@gmail.com
+                <a href="mailto:komezajuorganization1@gmail.com" className="transition hover:text-primary">
+                  komezajuorganization1@gmail.com
                 </a>
               </li>
               <li>Nyabivumu, Nyamata</li>
